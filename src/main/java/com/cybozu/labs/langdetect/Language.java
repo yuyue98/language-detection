@@ -17,8 +17,11 @@ public class Language {
         this.lang = lang;
         this.prob = prob;
     }
+    @Override
     public String toString() {
-        if (lang==null) return "";
+        if (lang==null) {
+            return "";
+        }
         return lang + ":" + prob;
     }
 }

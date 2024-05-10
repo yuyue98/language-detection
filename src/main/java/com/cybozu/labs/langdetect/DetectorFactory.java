@@ -1,17 +1,17 @@
 package com.cybozu.labs.langdetect;
 
+import com.cybozu.labs.langdetect.util.LangProfile;
+import net.arnx.jsonic.JSON;
+import net.arnx.jsonic.JSONException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
-import net.arnx.jsonic.JSON;
-import net.arnx.jsonic.JSONException;
-
-import com.cybozu.labs.langdetect.util.LangProfile;
 
 /**
  * Language Detector Factory Class
@@ -46,6 +46,22 @@ public class DetectorFactory {
     /**
      * Load profiles from specified directory.
      * This method must be called once before language detection.
+     *
+     * @throws LangDetectException  Can't open profiles(error code = {@link ErrorCode#FileLoadError})
+     *                              or profile's format is wrong (error code = {@link ErrorCode#FormatError})
+     */
+    public static void loadProfile() throws LangDetectException {
+        URL resource = DetectorFactory.class.getResource("/profiles");
+        if (resource != null) {
+            loadProfile(resource.getFile());
+        } else {
+            throw new LangDetectException(ErrorCode.NeedLoadProfileError, "Not found profiles");
+        }
+    }
+
+    /**
+     * Load profiles from specified directory.
+     * This method must be called once before language detection.
      *  
      * @param profileDirectory profile directory path
      * @throws LangDetectException  Can't open profiles(error code = {@link ErrorCode#FileLoadError})
@@ -65,12 +81,15 @@ public class DetectorFactory {
      */
     public static void loadProfile(File profileDirectory) throws LangDetectException {
         File[] listFiles = profileDirectory.listFiles();
-        if (listFiles == null)
+        if (listFiles == null) {
             throw new LangDetectException(ErrorCode.NeedLoadProfileError, "Not found profile: " + profileDirectory);
+        }
             
         int langsize = listFiles.length, index = 0;
         for (File file: listFiles) {
-            if (file.getName().startsWith(".") || !file.isFile()) continue;
+            if (file.getName().startsWith(".") || !file.isFile()) {
+                continue;
+            }
             FileInputStream is = null;
             try {
                 is = new FileInputStream(file);
@@ -83,7 +102,9 @@ public class DetectorFactory {
                 throw new LangDetectException(ErrorCode.FileLoadError, "can't open '" + file.getName() + "'");
             } finally {
                 try {
-                    if (is!=null) is.close();
+                    if (is!=null) {
+                        is.close();
+                    }
                 } catch (IOException e) {}
             }
         }
@@ -93,15 +114,16 @@ public class DetectorFactory {
      * Load profiles from specified directory.
      * This method must be called once before language detection.
      *  
-     * @param profileDirectory profile directory path
+     * @param json_profiles profile directory path
      * @throws LangDetectException  Can't open profiles(error code = {@link ErrorCode#FileLoadError})
      *                              or profile's format is wrong (error code = {@link ErrorCode#FormatError})
      */
     public static void loadProfile(List<String> json_profiles) throws LangDetectException {
         int index = 0;
         int langsize = json_profiles.size();
-        if (langsize < 2)
+        if (langsize < 2) {
             throw new LangDetectException(ErrorCode.NeedLoadProfileError, "Need more than 2 profiles");
+        }
             
         for (String json: json_profiles) {
             try {
@@ -170,8 +192,9 @@ public class DetectorFactory {
     }
 
     static private Detector createDetector() throws LangDetectException {
-        if (instance_.langlist.size()==0)
+        if (instance_.langlist.size()==0) {
             throw new LangDetectException(ErrorCode.NeedLoadProfileError, "need to load profiles");
+        }
         Detector detector = new Detector(instance_);
         return detector;
     }

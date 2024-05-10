@@ -35,9 +35,13 @@ public class LangProfile {
      * @param gram
      */
     public void add(String gram) {
-        if (name == null || gram == null) return;   // Illegal
+        if (name == null || gram == null) {
+            return;   // Illegal
+        }
         int len = gram.length();
-        if (len < 1 || len > NGram.N_GRAM) return;  // Illegal
+        if (len < 1 || len > NGram.N_GRAM) {
+            return;  // Illegal
+        }
         ++n_words[len - 1];
         if (freq.containsKey(gram)) {
             freq.put(gram, freq.get(gram) + 1);
@@ -50,9 +54,13 @@ public class LangProfile {
      * Eliminate below less frequency n-grams and noise Latin alphabets
      */
     public void omitLessFreq() {
-        if (name == null) return;   // Illegal
+        if (name == null) {
+            return;   // Illegal
+        }
         int threshold = n_words[0] / LESS_FREQ_RATIO;
-        if (threshold < MINIMUM_FREQ) threshold = MINIMUM_FREQ;
+        if (threshold < MINIMUM_FREQ) {
+            threshold = MINIMUM_FREQ;
+        }
         
         Set<String> keys = freq.keySet();
         int roman = 0;
@@ -89,7 +97,9 @@ public class LangProfile {
      * @param text (fragmented) text to extract n-grams
      */
     public void update(String text) {
-        if (text == null) return;
+        if (text == null) {
+            return;
+        }
         text = NGram.normalize_vi(text);
         NGram gram = new NGram();
         for(int i=0; i<text.length(); ++i) {

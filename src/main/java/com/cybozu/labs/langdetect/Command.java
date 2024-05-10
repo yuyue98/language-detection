@@ -1,20 +1,14 @@
 package com.cybozu.labs.langdetect;
 
-import java.io.File;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.cybozu.labs.langdetect.util.LangProfile;
+import net.arnx.jsonic.JSON;
+import net.arnx.jsonic.JSONException;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-
-import com.cybozu.labs.langdetect.util.LangProfile;
-
-import net.arnx.jsonic.JSON;
-import net.arnx.jsonic.JSONException;
 
 /**
  * 
@@ -63,7 +57,9 @@ public class Command {
     }
     private Long getLong(String key) {
         String value = values.get(key);
-        if (value == null) return null;
+        if (value == null) {
+            return null;
+        }
         try {
             return Long.valueOf(value);
         } catch (NumberFormatException e) {
@@ -91,7 +87,9 @@ public class Command {
      */
     private File searchFile(File directory, String pattern) {
         for(File file : directory.listFiles()) {
-            if (file.getName().matches(pattern)) return file;
+            if (file.getName().matches(pattern)) {
+                return file;
+            }
         }
         return null;
     }
@@ -106,7 +104,9 @@ public class Command {
         try {
             DetectorFactory.loadProfile(profileDirectory);
             Long seed = getLong("seed");
-            if (seed != null) DetectorFactory.setSeed(seed);
+            if (seed != null) {
+                DetectorFactory.setSeed(seed);
+            }
             return false;
         } catch (LangDetectException e) {
             System.err.println("ERROR: " + e.getMessage());
@@ -147,7 +147,9 @@ public class Command {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (os!=null) os.close();
+                    if (os!=null) {
+                        os.close();
+                    }
                 } catch (IOException e) {}
             }
         }        
@@ -194,7 +196,9 @@ public class Command {
             e.printStackTrace();
         } finally {
             try {
-                if (os!=null) os.close();
+                if (os!=null) {
+                    os.close();
+                }
             } catch (IOException e) {}
         }
     }
@@ -208,14 +212,18 @@ public class Command {
      * 
      */
     public void detectLang() {
-        if (loadProfile()) return;
+        if (loadProfile()) {
+            return;
+        }
         for (String filename: arglist) {
             BufferedReader is = null;
             try {
                 is = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "utf-8"));
 
                 Detector detector = DetectorFactory.create(getDouble("alpha", DEFAULT_ALPHA));
-                if (hasOpt("--debug")) detector.setVerbose();
+                if (hasOpt("--debug")) {
+                    detector.setVerbose();
+                }
                 detector.append(is);
                 System.out.println(filename + ":" + detector.getProbabilities());
             } catch (IOException e) {
@@ -224,7 +232,9 @@ public class Command {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (is!=null) is.close();
+                    if (is!=null) {
+                        is.close();
+                    }
                 } catch (IOException e) {}
             }
 
@@ -245,7 +255,9 @@ public class Command {
      *  
      */
     public void batchTest() {
-        if (loadProfile()) return;
+        if (loadProfile()) {
+            return;
+        }
         HashMap<String, ArrayList<String>> result = new HashMap<String, ArrayList<String>>();
         for (String filename: arglist) {
             BufferedReader is = null;
@@ -254,7 +266,9 @@ public class Command {
                 while (is.ready()) {
                     String line = is.readLine();
                     int idx = line.indexOf('\t');
-                    if (idx <= 0) continue;
+                    if (idx <= 0) {
+                        continue;
+                    }
                     String correctLang = line.substring(0, idx);
                     String text = line.substring(idx + 1);
                     
@@ -266,9 +280,13 @@ public class Command {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    if (!result.containsKey(correctLang)) result.put(correctLang, new ArrayList<String>());
+                    if (!result.containsKey(correctLang)) {
+                        result.put(correctLang, new ArrayList<String>());
+                    }
                     result.get(correctLang).add(lang);
-                    if (hasOpt("--debug")) System.out.println(correctLang + "," + lang + "," + (text.length()>100?text.substring(0, 100):text));
+                    if (hasOpt("--debug")) {
+                        System.out.println(correctLang + "," + lang + "," + (text.length()>100?text.substring(0, 100):text));
+                    }
                 }
                 
             } catch (IOException e) {
@@ -277,7 +295,9 @@ public class Command {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (is!=null) is.close();
+                    if (is!=null) {
+                        is.close();
+                    }
                 } catch (IOException e) {}
             }
 
@@ -286,7 +306,7 @@ public class Command {
 
             int totalCount = 0, totalCorrect = 0;
             for ( String lang :langlist) {
-                HashMap<String, Integer> resultCount = new HashMap<String, Integer>();
+                HashMap<String, Integer> resultCount = new HashMap<>();
                 int count = 0;
                 ArrayList<String> list = result.get(lang);
                 for (String detectedLang: list) {

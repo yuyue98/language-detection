@@ -1,19 +1,13 @@
 package com.cybozu.labs.langdetect;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.zip.GZIPInputStream;
+import com.cybozu.labs.langdetect.util.LangProfile;
+import com.cybozu.labs.langdetect.util.TagExtractor;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
-import com.cybozu.labs.langdetect.util.LangProfile;
-import com.cybozu.labs.langdetect.util.TagExtractor;
+import java.io.*;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Load Wikipedia's abstract XML as corpus and
@@ -38,7 +32,9 @@ public class GenProfile {
         BufferedReader br = null;
         try {
             InputStream is = new FileInputStream(file);
-            if (file.getName().endsWith(".gz")) is = new GZIPInputStream(is);
+            if (file.getName().endsWith(".gz")) {
+                is = new GZIPInputStream(is);
+            }
             br = new BufferedReader(new InputStreamReader(is, "utf-8"));
 
             TagExtractor tagextractor = new TagExtractor("abstract", 100);
@@ -57,7 +53,9 @@ public class GenProfile {
                         break;
                     case XMLStreamReader.END_ELEMENT:
                         String text = tagextractor.closeTag();
-                        if (text != null) profile.update(text);
+                        if (text != null) {
+                            profile.update(text);
+                        }
                         break;
                     }
                 }
@@ -65,7 +63,9 @@ public class GenProfile {
                 throw new LangDetectException(ErrorCode.TrainDataFormatError, "Training database file '" + file.getName() + "' is an invalid XML.");
             } finally {
                 try {
-                    if (reader != null) reader.close();
+                    if (reader != null) {
+                        reader.close();
+                    }
                 } catch (XMLStreamException e) {}
             }
             System.out.println(lang + ":" + tagextractor.count());
@@ -74,7 +74,9 @@ public class GenProfile {
             throw new LangDetectException(ErrorCode.CantOpenTrainData, "Can't open training database file '" + file.getName() + "'");
         } finally {
             try {
-                if (br != null) br.close();
+                if (br != null) {
+                    br.close();
+                }
             } catch (IOException e) {}
         }
         return profile;
@@ -109,7 +111,9 @@ public class GenProfile {
             throw new LangDetectException(ErrorCode.CantOpenTrainData, "Can't open training database file '" + file.getName() + "'");
         } finally {
             try {
-                if (is != null) is.close();
+                if (is != null) {
+                    is.close();
+                }
             } catch (IOException e) {}
         }
         return profile;

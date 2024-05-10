@@ -36,14 +36,18 @@ public class NGram {
         if (lastchar == ' ') {
             grams_ = new StringBuffer(" ");
             capitalword_ = false;
-            if (ch==' ') return;
+            if (ch==' ') {
+                return;
+            }
         } else if (grams_.length() >= N_GRAM) {
             grams_.deleteCharAt(0);
         }
         grams_.append(ch);
 
         if (Character.isUpperCase(ch)){
-            if (Character.isUpperCase(lastchar)) capitalword_ = true;
+            if (Character.isUpperCase(lastchar)) {
+                capitalword_ = true;
+            }
         } else {
             capitalword_ = false;
         }
@@ -55,12 +59,18 @@ public class NGram {
      * @return n-Gram String (null if it is invalid)
      */
     public String get(int n) {
-        if (capitalword_) return null;
+        if (capitalword_) {
+            return null;
+        }
         int len = grams_.length(); 
-        if (n < 1 || n > 3 || len < n) return null;
+        if (n < 1 || n > 3 || len < n) {
+            return null;
+        }
         if (n == 1) {
             char ch = grams_.charAt(len - 1);
-            if (ch == ' ') return null;
+            if (ch == ' ') {
+                return null;
+            }
             return Character.toString(ch);
         } else {
             return grams_.substring(len - n, len);
@@ -75,19 +85,31 @@ public class NGram {
     static public char normalize(char ch) {
         Character.UnicodeBlock block = Character.UnicodeBlock.of(ch);
         if (block == UnicodeBlock.BASIC_LATIN) {
-            if (ch<'A' || (ch<'a' && ch >'Z') || ch>'z') ch = ' ';
+            if (ch<'A' || (ch<'a' && ch >'Z') || ch>'z') {
+                ch = ' ';
+            }
         } else if (block == UnicodeBlock.LATIN_1_SUPPLEMENT) {
-            if (LATIN1_EXCLUDED.indexOf(ch)>=0) ch = ' ';
+            if (LATIN1_EXCLUDED.indexOf(ch)>=0) {
+                ch = ' ';
+            }
         } else if (block == UnicodeBlock.LATIN_EXTENDED_B) {
             // normalization for Romanian
-            if (ch == '\u0219') ch = '\u015f';  // Small S with comma below => with cedilla
-            if (ch == '\u021b') ch = '\u0163';  // Small T with comma below => with cedilla
+            if (ch == '\u0219') {
+                ch = '\u015f';  // Small S with comma below => with cedilla
+            }
+            if (ch == '\u021b') {
+                ch = '\u0163';  // Small T with comma below => with cedilla
+            }
         } else if (block == UnicodeBlock.GENERAL_PUNCTUATION) {
             ch = ' ';
         } else if (block == UnicodeBlock.ARABIC) {
-            if (ch == '\u06cc') ch = '\u064a';  // Farsi yeh => Arabic yeh
+            if (ch == '\u06cc') {
+                ch = '\u064a';  // Farsi yeh => Arabic yeh
+            }
         } else if (block == UnicodeBlock.LATIN_EXTENDED_ADDITIONAL) {
-            if (ch >= '\u1ea0') ch = '\u1ec3';
+            if (ch >= '\u1ea0') {
+                ch = '\u1ec3';
+            }
         } else if (block == UnicodeBlock.HIRAGANA) {
             ch = '\u3042';
         } else if (block == UnicodeBlock.KATAKANA) {
@@ -95,7 +117,9 @@ public class NGram {
         } else if (block == UnicodeBlock.BOPOMOFO || block == UnicodeBlock.BOPOMOFO_EXTENDED) {
             ch = '\u3105';
         } else if (block == UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS) {
-            if (cjk_map.containsKey(ch)) ch = cjk_map.get(ch);
+            if (cjk_map.containsKey(ch)) {
+                ch = cjk_map.get(ch);
+            }
         } else if (block == UnicodeBlock.HANGUL_SYLLABLES) {
             ch = '\uac00';
         }
@@ -116,8 +140,9 @@ public class NGram {
             int dmark = DMARK_CLASS.indexOf(m.group(2)); // Diacritical Mark
             m.appendReplacement(buf, NORMALIZED_VI_CHARS[dmark].substring(alphabet, alphabet + 1));
         }
-        if (buf.length() == 0)
+        if (buf.length() == 0) {
             return text;
+        }
         m.appendTail(buf);
         return buf.toString();
     }
