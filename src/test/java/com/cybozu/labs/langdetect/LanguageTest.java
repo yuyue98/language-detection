@@ -1,34 +1,31 @@
-/**
- * 
- */
 package com.cybozu.labs.langdetect;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Nakatani Shuyo
  *
  */
-public class LanguageTest {
+class LanguageTest {
 
     /**
      * @throws java.lang.Exception
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
     }
 
     /**
      * @throws java.lang.Exception
      */
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
     }
 
@@ -36,7 +33,7 @@ public class LanguageTest {
      * Test method for {@link com.cybozu.labs.langdetect.Language#Language(java.lang.String, double)}.
      */
     @Test
-    public final void testLanguage() {
+    final void testLanguage() {
         Language lang = new Language(null, 0);
         assertEquals(lang.lang, null);
         assertEquals(lang.prob, 0.0, 0.0001);
@@ -50,7 +47,7 @@ public class LanguageTest {
     }
 
     @Test
-    public final void testText() throws LangDetectException {
+    final void testText() throws LangDetectException {
         String profileDirectory = "profiles.sm";
         String text = "hello";
         DetectorFactory.loadProfile(new File(profileDirectory));

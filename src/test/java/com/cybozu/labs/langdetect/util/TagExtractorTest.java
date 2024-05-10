@@ -1,15 +1,8 @@
-/**
- * 
- */
 package com.cybozu.labs.langdetect.util;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Nakatani Shuyo
@@ -20,28 +13,28 @@ public class TagExtractorTest {
     /**
      * @throws java.lang.Exception
      */
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
     }
 
     /**
      * @throws java.lang.Exception
      */
-    @AfterClass
+    @AfterAll
     public static void tearDownAfterClass() throws Exception {
     }
 
     /**
      * @throws java.lang.Exception
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
     }
 
     /**
      * @throws java.lang.Exception
      */
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
     }
 
@@ -49,7 +42,7 @@ public class TagExtractorTest {
      * Test method for {@link com.cybozu.labs.langdetect.util.TagExtractor#TagExtractor(java.lang.String, int)}.
      */
     @Test
-    public final void testTagExtractor() {
+    final void testTagExtractor() {
         TagExtractor extractor = new TagExtractor(null, 0);
         assertEquals(extractor.target_, null);
         assertEquals(extractor.threshold_, 0);
@@ -63,7 +56,7 @@ public class TagExtractorTest {
      * Test method for {@link com.cybozu.labs.langdetect.util.TagExtractor#setTag(java.lang.String)}.
      */
     @Test
-    public final void testSetTag() {
+    final void testSetTag() {
         TagExtractor extractor = new TagExtractor(null, 0);
         extractor.setTag("");
         assertEquals(extractor.tag_, "");
@@ -72,20 +65,21 @@ public class TagExtractorTest {
     }
 
     /**
-     * Test method for {@link com.cybozu.labs.langdetect.util.TagExtractor#add(java.lang.String)}.
+     * Test method for {@link TagExtractor#add(String)}.
      */
     @Test
-    public final void testAdd() {
+    final void testAdd() {
         TagExtractor extractor = new TagExtractor(null, 0);
         extractor.add("");
         extractor.add(null);    // ignore
     }
 
     /**
-     * Test method for {@link com.cybozu.labs.langdetect.util.TagExtractor#closeTag(com.cybozu.labs.langdetect.util.LangProfile)}.
+     * {@link com.cybozu.labs.langdetect.util.TagExtractor}
+     * Test method for {@link TagExtractor#closeTag()}.
      */
     @Test
-    public final void testCloseTag() {
+    final void testCloseTag() {
         TagExtractor extractor = new TagExtractor(null, 0);
         extractor.closeTag();    // ignore
     }
@@ -95,7 +89,7 @@ public class TagExtractorTest {
      * Scenario Test of extracting &lt;abstract&gt; tag from Wikipedia database.
      */
     @Test
-    public final void testNormalScenario() {
+    final void testNormalScenario() {
         TagExtractor extractor = new TagExtractor("abstract", 10);
         assertEquals(extractor.count(), 0);
 
@@ -127,7 +121,7 @@ public class TagExtractorTest {
      * Test method for {@link com.cybozu.labs.langdetect.util.TagExtractor#clear()}.
      */
     @Test
-    public final void testClear() {
+    final void testClear() {
         TagExtractor extractor = new TagExtractor("abstract", 10);
         extractor.setTag("abstract");
         extractor.add("This is a sample text.");

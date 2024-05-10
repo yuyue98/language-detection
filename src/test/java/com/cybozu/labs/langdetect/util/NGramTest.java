@@ -3,12 +3,13 @@
  */
 package com.cybozu.labs.langdetect.util;
 
-import static org.junit.Assert.*;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Nakatani Shuyo
@@ -19,14 +20,14 @@ public class NGramTest {
     /**
      * @throws java.lang.Exception
      */
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
     }
 
     /**
      * @throws java.lang.Exception
      */
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
     }
 
@@ -34,8 +35,8 @@ public class NGramTest {
      * Test method for constants
      */
     @Test
-    public final void testConstants() {
-        assertThat(NGram.N_GRAM, is(3));
+    final void testConstants() {
+        MatcherAssert.assertThat(NGram.N_GRAM, CoreMatchers.is(3));
         assertEquals(NGram.N_GRAM, 3);
     }
 
@@ -43,7 +44,7 @@ public class NGramTest {
      * Test method for {@link NGram#normalize(char)} with Latin characters
      */
     @Test
-    public final void testNormalizeWithLatin() {
+    final void testNormalizeWithLatin() {
         assertEquals(NGram.normalize('\u0000'), ' ');
         assertEquals(NGram.normalize('\u0009'), ' ');
         assertEquals(NGram.normalize('\u0020'), ' ');
@@ -66,7 +67,7 @@ public class NGramTest {
      * Test method for {@link NGram#normalize(char)} with CJK Kanji characters
      */
     @Test
-    public final void testNormalizeWithCJKKanji() {
+    final void testNormalizeWithCJKKanji() {
         assertEquals(NGram.normalize('\u4E00'), '\u4E00');
         assertEquals(NGram.normalize('\u4E01'), '\u4E01');
         assertEquals(NGram.normalize('\u4E02'), '\u4E02');
@@ -98,7 +99,7 @@ public class NGramTest {
      * Test method for {@link NGram#normalize(char)} for Romanian characters
      */
     @Test
-    public final void testNormalizeForRomanian() {
+    final void testNormalizeForRomanian() {
         assertEquals(NGram.normalize('\u015f'), '\u015f');
         assertEquals(NGram.normalize('\u0163'), '\u0163');
         assertEquals(NGram.normalize('\u0219'), '\u015f');
@@ -109,7 +110,7 @@ public class NGramTest {
      * Test method for {@link NGram#get(int)} and {@link NGram#addChar(char)}
      */
     @Test
-    public final void testNGram() {
+    final void testNGram() {
         NGram ngram = new NGram();
         assertEquals(ngram.get(0), null);
         assertEquals(ngram.get(1), null);
@@ -165,7 +166,7 @@ public class NGramTest {
      * Test method for {@link NGram#get(int)} and {@link NGram#addChar(char)}
      */
     @Test
-    public final void testNGram3() {
+    final void testNGram3() {
         NGram ngram = new NGram();
 
         ngram.addChar('A');
@@ -189,7 +190,7 @@ public class NGramTest {
      * Test method for {@link NGram#get(int)} and {@link NGram#addChar(char)}
      */
     @Test
-    public final void testNormalizeVietnamese() {
+    final void testNormalizeVietnamese() {
         assertEquals(NGram.normalize_vi(""), "");
         assertEquals(NGram.normalize_vi("ABC"), "ABC");
         assertEquals(NGram.normalize_vi("012"), "012");

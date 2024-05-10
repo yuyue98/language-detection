@@ -1,22 +1,21 @@
 package com.cybozu.labs.langdetect;
 
-import static org.junit.Assert.*;
+import com.cybozu.labs.langdetect.util.LangProfile;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.cybozu.labs.langdetect.util.LangProfile;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit test for {@link Detector} and {@link DetectorFactory}.
  * @author Nakatani Shuyo
  *
  */
-public class DetectorTest {
+class DetectorTest {
 
     private static final String TRAINING_EN = "a a a b b c c d e";
     private static final String TRAINING_FR = "a b b c c c d d d";
@@ -24,7 +23,7 @@ public class DetectorTest {
     private static final String JSON_LANG1 = "{\"freq\":{\"A\":3,\"B\":6,\"C\":3,\"AB\":2,\"BC\":1,\"ABC\":2,\"BBC\":1,\"CBA\":1},\"n_words\":[12,3,4],\"name\":\"lang1\"}";
     private static final String JSON_LANG2 = "{\"freq\":{\"A\":6,\"B\":3,\"C\":3,\"AA\":3,\"AB\":2,\"ABC\":1,\"ABA\":1,\"CAA\":1},\"n_words\":[12,5,3],\"name\":\"lang2\"}";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         DetectorFactory.clear();
         
@@ -44,40 +43,40 @@ public class DetectorTest {
         DetectorFactory.addProfile(profile_ja, 2, 3);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
     }
 
     @Test
-    public final void testDetector1() throws LangDetectException {
+    final void testDetector1() throws LangDetectException {
         Detector detect = DetectorFactory.create();
         detect.append("a");
         assertEquals(detect.detect(), "en");
     }
 
     @Test
-    public final void testDetector2() throws LangDetectException {
+    final void testDetector2() throws LangDetectException {
         Detector detect = DetectorFactory.create();
         detect.append("b d");
         assertEquals(detect.detect(), "fr");
     }
 
     @Test
-    public final void testDetector3() throws LangDetectException {
+    final void testDetector3() throws LangDetectException {
         Detector detect = DetectorFactory.create();
         detect.append("d e");
         assertEquals(detect.detect(), "en");
     }
 
     @Test
-    public final void testDetector4() throws LangDetectException {
+    final void testDetector4() throws LangDetectException {
         Detector detect = DetectorFactory.create();
         detect.append("\u3042\u3042\u3042\u3042a");
         assertEquals(detect.detect(), "ja");
     }
     
     @Test
-    public final void testLangList() throws LangDetectException {
+    final void testLangList() throws LangDetectException {
         List<String> langList = DetectorFactory.getLangList();
         assertEquals(langList.size(), 3);
         assertEquals(langList.get(0), "en");
@@ -85,15 +84,15 @@ public class DetectorTest {
         assertEquals(langList.get(2), "ja");
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public final void testLangListException() throws LangDetectException {
+    @Test
+    final void testLangListException() throws LangDetectException {
         List<String> langList = DetectorFactory.getLangList();
         langList.add("hoge");
         //langList.add(1, "hoge");
     }
 
     @Test
-    public final void testFactoryFromJsonString() throws LangDetectException {
+    final void testFactoryFromJsonString() throws LangDetectException {
         DetectorFactory.clear();
         ArrayList<String> profiles = new ArrayList<String>();
         profiles.add(JSON_LANG1);
