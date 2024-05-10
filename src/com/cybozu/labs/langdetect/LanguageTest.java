@@ -3,11 +3,14 @@
  */
 package com.cybozu.labs.langdetect;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Nakatani Shuyo
@@ -44,6 +47,18 @@ public class LanguageTest {
         assertEquals(lang2.prob, 1.0, 0.0001);
         assertEquals(lang2.toString(), "en:1.0");
         
+    }
+
+    @Test
+    public final void testText() throws LangDetectException {
+        String profileDirectory = "profiles.sm";
+        String text = "hello";
+        DetectorFactory.loadProfile(new File(profileDirectory));
+        Detector detector = DetectorFactory.create();
+        detector.append(text);
+        String detect = detector.detect();
+
+        assertNotNull(detect);
     }
 
 }
