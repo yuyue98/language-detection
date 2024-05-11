@@ -118,14 +118,14 @@ public class Detector {
             if (priorMap.containsKey(lang)) {
                 double p = priorMap.get(lang);
                 if (p<0) {
-                    throw new LangDetectException(ErrorCode.InitParamError, "Prior probability must be non-negative.");
+                    throw new LangDetectException(ErrorCode.INIT_PARAM_ERROR, "Prior probability must be non-negative.");
                 }
                 this.priorMap[i] = p;
                 sump += p;
             }
         }
         if (sump<=0) {
-            throw new LangDetectException(ErrorCode.InitParamError, "More one of prior probability must be non-zero.");
+            throw new LangDetectException(ErrorCode.INIT_PARAM_ERROR, "More one of prior probability must be non-zero.");
         }
         for (int i=0;i<this.priorMap.length;++i) {
             this.priorMap[i] /= sump;
@@ -243,7 +243,7 @@ public class Detector {
         cleaningText();
         ArrayList<String> ngrams = extractNGrams();
         if (ngrams.size()==0) {
-            throw new LangDetectException(ErrorCode.CantDetectError, "no features in text");
+            throw new LangDetectException(ErrorCode.CANT_DETECT_ERROR, "no features in text");
         }
         
         langprob = new double[langlist.size()];

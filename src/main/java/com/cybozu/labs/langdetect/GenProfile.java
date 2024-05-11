@@ -61,7 +61,7 @@ public class GenProfile {
                     }
                 }
             } catch (XMLStreamException e) {
-                throw new LangDetectException(ErrorCode.TrainDataFormatError, "Training database file '" + file.getName() + "' is an invalid XML.");
+                throw new LangDetectException(ErrorCode.TRAIN_DATA_FORMAT_ERROR, "Training database file '" + file.getName() + "' is an invalid XML.");
             } finally {
                 try {
                     if (reader != null) {
@@ -72,7 +72,7 @@ public class GenProfile {
             System.out.println(lang + ":" + tagextractor.count());
 
         } catch (IOException e) {
-            throw new LangDetectException(ErrorCode.CantOpenTrainData, "Can't open training database file '" + file.getName() + "'");
+            throw new LangDetectException(ErrorCode.CANT_OPEN_TRAIN_DATA, "Can't open training database file '" + file.getName() + "'");
         } finally {
             try {
                 if (br != null) {
@@ -109,7 +109,7 @@ public class GenProfile {
             System.out.println(lang + ":" + count);
 
         } catch (IOException e) {
-            throw new LangDetectException(ErrorCode.CantOpenTrainData, "Can't open training database file '" + file.getName() + "'");
+            throw new LangDetectException(ErrorCode.CANT_OPEN_TRAIN_DATA, "Can't open training database file '" + file.getName() + "'");
         } finally {
             try {
                 if (is != null) {
