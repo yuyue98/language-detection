@@ -78,7 +78,7 @@ class DetectorTest {
     
     @Test
     final void testLangList() throws LangDetectException {
-        List<String> langList = DetectorFactory.getLangList();
+        List<String> langList = DetectorFactory.getUnmodifiableLangList();
         assertEquals(langList.size(), 3);
         assertEquals(langList.get(0), "en");
         assertEquals(langList.get(1), "fr");
@@ -87,7 +87,7 @@ class DetectorTest {
 
     @Test
     final void testLangListException() throws LangDetectException {
-        List<String> langList = DetectorFactory.getLangList();
+        List<String> langList = DetectorFactory.getUnmodifiableLangList();
         langList.add("hoge");
         //langList.add(1, "hoge");
     }
@@ -99,7 +99,7 @@ class DetectorTest {
         profiles.add(JSON_LANG1);
         profiles.add(JSON_LANG2);
         DetectorFactory.loadProfile(profiles);
-        List<String> langList = DetectorFactory.getLangList();
+        List<String> langList = DetectorFactory.getUnmodifiableLangList();
         assertEquals(langList.size(), 2);
         assertEquals(langList.get(0), "lang1");
         assertEquals(langList.get(1), "lang2");

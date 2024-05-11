@@ -1,8 +1,11 @@
 package com.cybozu.labs.langdetect.util;
 
 import com.cybozu.labs.langdetect.constant.enums.DefaultCorpusEnum;
+import com.cybozu.labs.langdetect.constant.enums.ErrorCode;
+import com.cybozu.labs.langdetect.exception.LangDetectRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import net.arnx.jsonic.JSON;
+import net.arnx.jsonic.JSONException;
 
 import java.io.*;
 import java.net.URL;
@@ -49,16 +52,19 @@ public class LdResourceUtil {
 
     /**
      * 解析并关闭语料文件流
+     * @param filename 文件名称
      * @param in 语料文件流
      * @return 语料对象
      */
-    public static LangProfile toLangProfile(InputStream in) {
+    public static LangProfile toLangProfile(String filename, InputStream in) {
         if (null == in) {
             return null;
         }
         LangProfile profile = null;
         try {
             profile = JSON.decode(in, LangProfile.class);
+        } catch (JSONException e) {
+            throw new LangDetectRuntimeException(ErrorCode.FORMAT_ERROR, String.format("profile format error in '%s'", filename));
         } catch (Exception e) {
             log.info("解析语料文件失败", e);
         } finally {
@@ -177,10 +183,11 @@ public class LdResourceUtil {
         files.stream()
                 .filter(f -> null != f && !f.isDirectory() && !f.getName().startsWith(HIDDEN_FILE_PREFIX))
                 .forEach(f -> {
+                    String filename = f.toString();
                     InputStream is = getInputStream(f);
-                    LangProfile profile = toLangProfile(is);
+                    LangProfile profile = toLangProfile(filename, is);
                     if (null != profile) {
-                        map.put(f.toString(), profile);
+                        map.put(filename, profile);
                     }
                 });
         return map;
@@ -206,7 +213,7 @@ public class LdResourceUtil {
                 String name = entry.getName();
                 if (name.startsWith(corpus.getPath()) && !entry.isDirectory() && !Paths.get(entry.getName()).getFileName().startsWith(HIDDEN_FILE_PREFIX)) {
                     InputStream is = jar.getInputStream(entry);
-                    LangProfile profile = toLangProfile(is);
+                    LangProfile profile = toLangProfile(name, is);
                     if (null != profile) {
                         map.put(name, profile);
                     }

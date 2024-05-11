@@ -65,8 +65,8 @@ public class Detector {
     private static final Pattern URL_REGEX = Pattern.compile("https?://[-_.?&~;+=/#0-9A-Za-z]{1,2076}");
     private static final Pattern MAIL_REGEX = Pattern.compile("[-_.0-9A-Za-z]{1,64}@[-_0-9A-Za-z]{1,255}[-_.0-9A-Za-z]{1,255}");
     
-    private final HashMap<String, double[]> wordLangProbMap;
-    private final ArrayList<String> langlist;
+    private final Map<String, double[]> wordLangProbMap;
+    private final List<String> langlist;
 
     private StringBuffer text;
     private double[] langprob = null;
@@ -84,10 +84,10 @@ public class Detector {
      * @param factory {@link DetectorFactory} instance (only DetectorFactory inside)
      */
     public Detector(DetectorFactory factory) {
-        this.wordLangProbMap = factory.wordLangProbMap;
-        this.langlist = factory.langlist;
+        this.wordLangProbMap = factory.getWordLangProbMap();
+        this.langlist = factory.getLanglist();
         this.text = new StringBuffer();
-        this.seed  = factory.seed;
+        this.seed  = factory.getSeed();
     }
 
     /**
