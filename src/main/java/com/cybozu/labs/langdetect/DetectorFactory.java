@@ -41,7 +41,6 @@ public class DetectorFactory {
     /** json语料单次导入最小数量 **/
     public static final int JSON_PROFILES_MIN_NUM = 2;
 
-
     private final Map<String, double[]> wordLangProbMap = new HashMap<>();
     private final List<String> langlist = new ArrayList<>();
     private Long seed = null;
@@ -155,18 +154,18 @@ public class DetectorFactory {
      * @param langsize 语料库大小
      */
     static /* package scope */ void addProfile(LangProfile profile, int index, int langsize) throws LangDetectException {
-        String lang = profile.name;
+        String lang = profile.getName();
         if (INSTANCE.getLanglist().contains(lang)) {
             throw new LangDetectException(ErrorCode.DUPLICATE_LANG_ERROR, "duplicate the same language profile");
         }
         INSTANCE.getLanglist().add(lang);
-        for (String word: profile.freq.keySet()) {
+        for (String word: profile.getFreq().keySet()) {
             if (!INSTANCE.getWordLangProbMap().containsKey(word)) {
                 INSTANCE.getWordLangProbMap().put(word, new double[langsize]);
             }
             int length = word.length();
             if (length >= 1 && length <= 3) {
-                double prob = profile.freq.get(word).doubleValue() / profile.n_words[length - 1];
+                double prob = profile.getFreq().get(word).doubleValue() / profile.getNWords()[length - 1];
                 INSTANCE.getWordLangProbMap().get(word)[index] = prob;
             }
         }
