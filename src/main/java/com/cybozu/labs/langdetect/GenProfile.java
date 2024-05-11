@@ -1,8 +1,10 @@
 package com.cybozu.labs.langdetect;
 
 import com.cybozu.labs.langdetect.constant.enums.ErrorCode;
+import com.cybozu.labs.langdetect.exception.LangDetectException;
 import com.cybozu.labs.langdetect.util.LangProfile;
 import com.cybozu.labs.langdetect.util.TagExtractor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -17,6 +19,7 @@ import java.util.zip.GZIPInputStream;
  * @author Nakatani Shuyo
  * 
  */
+@Slf4j
 public class GenProfile {
 
     /**
@@ -95,9 +98,7 @@ public class GenProfile {
 
         LangProfile profile = new LangProfile(lang);
 
-        BufferedReader is = null;
-        try {
-            is = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
+        try (BufferedReader is = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"))) {
 
             int count = 0;
             while (is.ready()) {
@@ -110,12 +111,6 @@ public class GenProfile {
 
         } catch (IOException e) {
             throw new LangDetectException(ErrorCode.CANT_OPEN_TRAIN_DATA, "Can't open training database file '" + file.getName() + "'");
-        } finally {
-            try {
-                if (is != null) {
-                    is.close();
-                }
-            } catch (IOException e) {}
         }
         return profile;
     }

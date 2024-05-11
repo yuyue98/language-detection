@@ -1,5 +1,6 @@
 package com.cybozu.labs.langdetect;
 
+import com.cybozu.labs.langdetect.exception.LangDetectException;
 import com.cybozu.labs.langdetect.util.LangProfile;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

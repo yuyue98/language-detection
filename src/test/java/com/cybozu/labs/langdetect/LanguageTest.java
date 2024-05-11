@@ -1,5 +1,6 @@
 package com.cybozu.labs.langdetect;
 
+import com.cybozu.labs.langdetect.exception.LangDetectException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,10 +48,11 @@ class LanguageTest {
     @Test
     final void testText() throws LangDetectException {
         String text = "hello";
-        DetectorFactory.loadProfile();
+        DetectorFactory.loadDefaultProfile();
         Detector detector = DetectorFactory.create();
         detector.append(text);
         String detect = detector.detect();
+        System.out.println(detect);
 
         assertNotNull(detect);
     }

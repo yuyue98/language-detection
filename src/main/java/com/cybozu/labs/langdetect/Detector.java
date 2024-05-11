@@ -1,6 +1,7 @@
 package com.cybozu.labs.langdetect;
 
 import com.cybozu.labs.langdetect.constant.enums.ErrorCode;
+import com.cybozu.labs.langdetect.exception.LangDetectException;
 import com.cybozu.labs.langdetect.util.NGram;
 
 import java.io.IOException;

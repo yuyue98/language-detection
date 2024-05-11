@@ -1,7 +1,11 @@
 package com.cybozu.labs.langdetect;
 
+import com.cybozu.labs.langdetect.constant.enums.DefaultCorpusEnum;
 import com.cybozu.labs.langdetect.constant.enums.ErrorCode;
+import com.cybozu.labs.langdetect.exception.LangDetectException;
+import com.cybozu.labs.langdetect.exception.LangDetectRuntimeException;
 import com.cybozu.labs.langdetect.util.LangProfile;
+import com.cybozu.labs.langdetect.util.LdResourceUtil;
 import net.arnx.jsonic.JSON;
 import net.arnx.jsonic.JSONException;
 
@@ -9,10 +13,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Language Detector Factory Class
@@ -43,7 +45,38 @@ public class DetectorFactory {
         langlist = new ArrayList<String>();
     }
 
-    private static DetectorFactory instance_ = new DetectorFactory();
+    private static final DetectorFactory INSTANCE = new DetectorFactory();
+
+    /**
+     * 加载默认语料库
+     */
+    public static void loadDefaultProfile() {
+        loadDefaultProfile(DefaultCorpusEnum.defaultValue());
+    }
+
+    /**
+     * 加载默认语料库
+     * @param corpus 语料库枚举
+     */
+    public static void loadDefaultProfile(DefaultCorpusEnum corpus) {
+        Map<String, LangProfile> map = LdResourceUtil.getCorpusIoList(corpus);
+        int langsize = map.size();
+        AtomicInteger index = new AtomicInteger();
+        map.forEach((filename, profile) -> {
+            try {
+                // 跳过未获取到语料的文件
+                if (null == profile) {
+                    return;
+                }
+                addProfile(profile, index.get(), langsize);
+                index.incrementAndGet();
+            } catch (JSONException e) {
+                throw new LangDetectRuntimeException(ErrorCode.FORMAT_ERROR, String.format("profile format error in '%s'", filename));
+            } catch (LangDetectException e) {
+                throw new LangDetectRuntimeException(e.getCode(), e);
+            }
+        });
+    }
 
     /**
      * Load profiles from specified directory.
@@ -146,18 +179,18 @@ public class DetectorFactory {
      */
     static /* package scope */ void addProfile(LangProfile profile, int index, int langsize) throws LangDetectException {
         String lang = profile.name;
-        if (instance_.langlist.contains(lang)) {
+        if (INSTANCE.langlist.contains(lang)) {
             throw new LangDetectException(ErrorCode.DUPLICATE_LANG_ERROR, "duplicate the same language profile");
         }
-        instance_.langlist.add(lang);
+        INSTANCE.langlist.add(lang);
         for (String word: profile.freq.keySet()) {
-            if (!instance_.wordLangProbMap.containsKey(word)) {
-                instance_.wordLangProbMap.put(word, new double[langsize]);
+            if (!INSTANCE.wordLangProbMap.containsKey(word)) {
+                INSTANCE.wordLangProbMap.put(word, new double[langsize]);
             }
             int length = word.length();
             if (length >= 1 && length <= 3) {
                 double prob = profile.freq.get(word).doubleValue() / profile.n_words[length - 1];
-                instance_.wordLangProbMap.get(word)[index] = prob;
+                INSTANCE.wordLangProbMap.get(word)[index] = prob;
             }
         }
     }
@@ -166,8 +199,8 @@ public class DetectorFactory {
      * Clear loaded language profiles (reinitialization to be available)
      */
     public static void clear() {
-        instance_.langlist.clear();
-        instance_.wordLangProbMap.clear();
+        INSTANCE.langlist.clear();
+        INSTANCE.wordLangProbMap.clear();
     }
 
     /**
@@ -194,18 +227,18 @@ public class DetectorFactory {
     }
 
     private static Detector createDetector() throws LangDetectException {
-        if (instance_.langlist.size()==0) {
+        if (INSTANCE.langlist.size()==0) {
             throw new LangDetectException(ErrorCode.NEED_LOAD_PROFILE_ERROR, "need to load profiles");
         }
-        Detector detector = new Detector(instance_);
+        Detector detector = new Detector(INSTANCE);
         return detector;
     }
     
     public static void setSeed(long seed) {
-        instance_.seed = seed;
+        INSTANCE.seed = seed;
     }
     
     public static final List<String> getLangList() {
-        return Collections.unmodifiableList(instance_.langlist);
+        return Collections.unmodifiableList(INSTANCE.langlist);
     }
 }
