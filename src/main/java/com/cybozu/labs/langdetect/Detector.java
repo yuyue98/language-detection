@@ -3,6 +3,8 @@ package com.cybozu.labs.langdetect;
 import com.cybozu.labs.langdetect.constant.enums.ErrorCode;
 import com.cybozu.labs.langdetect.exception.LangDetectException;
 import com.cybozu.labs.langdetect.util.NGram;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -20,7 +22,7 @@ import java.util.regex.Pattern;
  * {@link #getProbabilities()} methods returns a list of multiple languages and their probabilities.
  * <p>  
  * The detector has some parameters for language detection.
- * See {@link #setAlpha(double)}, {@link #setMaxTextLength(int)} and {@link #setPriorMap(HashMap)}.
+ * See {@link #setAlpha(double)}, {@link #setMaxTextLength(int)} and {@link #setPriorMap(Map)}.
  * 
  * <pre>
  * import java.util.ArrayList;
@@ -52,6 +54,7 @@ import java.util.regex.Pattern;
  * @author Nakatani Shuyo
  * @see DetectorFactory
  */
+@Slf4j
 public class Detector {
     private static final double ALPHA_DEFAULT = 0.5;
     private static final double ALPHA_WIDTH = 0.05;
@@ -68,12 +71,21 @@ public class Detector {
     private final Map<String, double[]> wordLangProbMap;
     private final List<String> langlist;
 
-    private StringBuffer text;
+    private StringBuilder text;
     private double[] langprob = null;
-
+    /**
+     *  Set smoothing parameter.
+     *  The default value is 0.5(i.e. Expected Likelihood Estimate).
+     */
+    @Setter
     private double alpha = ALPHA_DEFAULT;
-    private int n_trial = 7;
-    private int max_text_length = 10000;
+    private int nTrial = 7;
+    /**
+     *  Specify max size of target text to use for language detection.
+     *  The default value is 10000(10KB).
+     */
+    @Setter
+    private int maxTextLength = 10000;
     private double[] priorMap = null;
     private boolean verbose = false;
     private Long seed = null;
@@ -86,7 +98,7 @@ public class Detector {
     public Detector(DetectorFactory factory) {
         this.wordLangProbMap = factory.getWordLangProbMap();
         this.langlist = factory.getLanglist();
-        this.text = new StringBuffer();
+        this.text = new StringBuilder();
         this.seed  = factory.getSeed();
     }
 
@@ -98,20 +110,10 @@ public class Detector {
     }
 
     /**
-     * Set smoothing parameter.
-     * The default value is 0.5(i.e. Expected Likelihood Estimate).
-     * @param alpha the smoothing parameter
-     */
-    public void setAlpha(double alpha) {
-        this.alpha = alpha;
-    }
-
-    /**
      * Set prior information about language probabilities.
      * @param priorMap the priorMap to set
-     * @throws LangDetectException 
      */
-    public void setPriorMap(HashMap<String, Double> priorMap) throws LangDetectException {
+    public void setPriorMap(Map<String, Double> priorMap) throws LangDetectException {
         this.priorMap = new double[langlist.size()];
         double sump = 0;
         for (int i=0;i<this.priorMap.length;++i) {
@@ -132,17 +134,8 @@ public class Detector {
             this.priorMap[i] /= sump;
         }
     }
-    
-    /**
-     * Specify max size of target text to use for language detection.
-     * The default value is 10000(10KB).
-     * @param max_text_length the max_text_length to set
-     */
-    public void setMaxTextLength(int max_text_length) {
-        this.max_text_length = max_text_length;
-    }
 
-    
+
     /**
      * Append the target text for language detection.
      * This method read the text from specified input reader.
@@ -153,8 +146,8 @@ public class Detector {
      * @throws IOException Can't read the reader.
      */
     public void append(Reader reader) throws IOException {
-        char[] buf = new char[max_text_length/2];
-        while (text.length() < max_text_length && reader.ready()) {
+        char[] buf = new char[maxTextLength /2];
+        while (text.length() < maxTextLength && reader.ready()) {
             int length = reader.read(buf);
             append(new String(buf, 0, length));
         }
@@ -172,7 +165,7 @@ public class Detector {
         text = MAIL_REGEX.matcher(text).replaceAll(" ");
         text = NGram.normalize_vi(text);
         char pre = 0;
-        for (int i = 0; i < text.length() && i < max_text_length; ++i) {
+        for (int i = 0; i < text.length() && i < maxTextLength; ++i) {
             char c = text.charAt(i);
             if (c != ' ' || pre != ' ') {
                 this.text.append(c);
@@ -196,7 +189,7 @@ public class Detector {
             }
         }
         if (latinCount * 2 < nonLatinCount) {
-            StringBuffer textWithoutLatin = new StringBuffer();
+            StringBuilder textWithoutLatin = new StringBuilder();
             for(int i = 0; i < text.length(); ++i) {
                 char c = text.charAt(i);
                 if (c > 'z' || c < 'A') {
@@ -242,8 +235,8 @@ public class Detector {
      */
     private void detectBlock() throws LangDetectException {
         cleaningText();
-        ArrayList<String> ngrams = extractNGrams();
-        if (ngrams.size()==0) {
+        List<String> ngrams = extractNGrams();
+        if (ngrams.isEmpty()) {
             throw new LangDetectException(ErrorCode.CANT_DETECT_ERROR, "no features in text");
         }
         
@@ -253,7 +246,7 @@ public class Detector {
         if (seed != null) {
             rand.setSeed(seed);
         }
-        for (int t = 0; t < n_trial; ++t) {
+        for (int t = 0; t < nTrial; ++t) {
             double[] prob = initProbability();
             double alpha = this.alpha + rand.nextGaussian() * ALPHA_WIDTH;
 
@@ -270,7 +263,7 @@ public class Detector {
                 }
             }
             for(int j=0;j<langprob.length;++j) {
-                langprob[j] += prob[j] / n_trial;
+                langprob[j] += prob[j] / nTrial;
             }
             if (verbose) {
                 System.out.println("==> " + sortProbability(prob));
@@ -301,8 +294,8 @@ public class Detector {
      * Extract n-grams from target text
      * @return n-grams list
      */
-    private ArrayList<String> extractNGrams() {
-        ArrayList<String> list = new ArrayList<String>();
+    private List<String> extractNGrams() {
+        List<String> list = new ArrayList<>();
         NGram ngram = new NGram();
         for(int i=0;i<text.length();++i) {
             ngram.addChar(text.charAt(i));
@@ -354,10 +347,11 @@ public class Detector {
      * normalize probabilities and check convergence by the maximun probability
      * @return maximum of probabilities
      */
-    static private double normalizeProb(double[] prob) {
-        double maxp = 0, sump = 0;
-        for(int i=0;i<prob.length;++i) {
-            sump += prob[i];
+    private static double normalizeProb(double[] prob) {
+        double maxp = 0;
+        double sump = 0;
+        for (double v : prob) {
+            sump += v;
         }
         for(int i=0;i<prob.length;++i) {
             double p = prob[i] / sump;
@@ -373,8 +367,8 @@ public class Detector {
      * @param prob HashMap
      * @return lanugage candidates order by probabilities descendently
      */
-    private ArrayList<Language> sortProbability(double[] prob) {
-        ArrayList<Language> list = new ArrayList<Language>();
+    private List<Language> sortProbability(double[] prob) {
+        List<Language> list = new ArrayList<>();
         for(int j=0;j<prob.length;++j) {
             double p = prob[j];
             if (p > PROB_THRESHOLD) {
@@ -391,11 +385,11 @@ public class Detector {
 
     /**
      * unicode encoding (for verbose mode)
-     * @param word
-     * @return
+     * @param word 文本
+     * @return 编码后文本
      */
-    static private String unicodeEncode(String word) {
-        StringBuffer buf = new StringBuffer();
+    private static String unicodeEncode(String word) {
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < word.length(); ++i) {
             char ch = word.charAt(i);
             if (ch >= '\u0080') {

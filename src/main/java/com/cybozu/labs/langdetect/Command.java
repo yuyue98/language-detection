@@ -1,6 +1,8 @@
 package com.cybozu.labs.langdetect;
 
+import com.cybozu.labs.langdetect.constant.enums.ErrorCode;
 import com.cybozu.labs.langdetect.exception.LangDetectException;
+import com.cybozu.labs.langdetect.exception.LangDetectRuntimeException;
 import com.cybozu.labs.langdetect.util.LangProfile;
 import net.arnx.jsonic.JSON;
 import net.arnx.jsonic.JSONException;
@@ -137,21 +139,21 @@ public class Command {
                 LangProfile profile = GenProfile.loadFromWikipediaAbstract(lang, file);
                 profile.omitLessFreq();
 
-                File profile_path = new File(get("directory") + "/profiles/" + lang);
-                os = new FileOutputStream(profile_path);
+                File profilePath = new File(get("directory") + "/profiles/" + lang);
+                os = new FileOutputStream(profilePath);
                 JSON.encode(profile, os);
             } catch (JSONException e) {
-                e.printStackTrace();
+                throw new LangDetectRuntimeException(ErrorCode.FORMAT_ERROR, "profile format error in '" + file.getName() + "'");
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new LangDetectRuntimeException(ErrorCode.CANT_OPEN_TRAIN_DATA, "Can't open training database file '" + file.getName() + "'");
             } catch (LangDetectException e) {
-                e.printStackTrace();
+                throw new LangDetectRuntimeException(e.getCode(), e);
             } finally {
                 try {
                     if (os!=null) {
                         os.close();
                     }
-                } catch (IOException e) {}
+                } catch (IOException ignored) {}
             }
         }        
     }
