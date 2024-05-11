@@ -1,5 +1,8 @@
 package com.cybozu.labs.langdetect;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 
 /**
@@ -10,13 +13,17 @@ import java.util.ArrayList;
  * @author Nakatani Shuyo
  *
  */
+@Getter
+@Setter
 public class Language {
-    public String lang;
-    public double prob;
+    private String lang;
+    private double prob;
+
     public Language(String lang, double prob) {
         this.lang = lang;
         this.prob = prob;
     }
+
     @Override
     public String toString() {
         if (lang==null) {

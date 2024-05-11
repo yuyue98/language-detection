@@ -1,12 +1,6 @@
 package com.cybozu.labs.langdetect;
 
-/**
- * @author Nakatani Shuyo
- */
-enum ErrorCode {
-    /** 报错信息 **/
-    NoTextError, FormatError, FileLoadError, DuplicateLangError, NeedLoadProfileError, CantDetectError, CantOpenTrainData, TrainDataFormatError, InitParamError
-}
+import com.cybozu.labs.langdetect.constant.enums.ErrorCode;
 
 /**
  * @author Nakatani Shuyo

@@ -1,5 +1,6 @@
 package com.cybozu.labs.langdetect;
 
+import com.cybozu.labs.langdetect.constant.enums.ErrorCode;
 import com.cybozu.labs.langdetect.util.LangProfile;
 import com.cybozu.labs.langdetect.util.TagExtractor;
 

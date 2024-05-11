@@ -33,13 +33,13 @@ class LanguageTest {
     @Test
     final void testLanguage() {
         Language lang = new Language(null, 0);
-        assertEquals(lang.lang, null);
-        assertEquals(lang.prob, 0.0, 0.0001);
+        assertEquals(lang.getLang(), null);
+        assertEquals(lang.getProb(), 0.0, 0.0001);
         assertEquals(lang.toString(), "");
         
         Language lang2 = new Language("en", 1.0);
-        assertEquals(lang2.lang, "en");
-        assertEquals(lang2.prob, 1.0, 0.0001);
+        assertEquals(lang2.getLang(), "en");
+        assertEquals(lang2.getProb(), 1.0, 0.0001);
         assertEquals(lang2.toString(), "en:1.0");
         
     }

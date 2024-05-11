@@ -1,14 +1,12 @@
 package com.cybozu.labs.langdetect;
 
+import com.cybozu.labs.langdetect.constant.enums.ErrorCode;
 import com.cybozu.labs.langdetect.util.NGram;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.Character.UnicodeBlock;
-import java.util.ArrayList;
-import java.util.Formatter;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -216,9 +214,9 @@ public class Detector {
      *  code = ErrorCode.CantDetectError : Can't detect because of no valid features in text
      */
     public String detect() throws LangDetectException {
-        ArrayList<Language> probabilities = getProbabilities();
-        if (probabilities.size() > 0) {
-            return probabilities.get(0).lang;
+        List<Language> probabilities = getProbabilities();
+        if (!probabilities.isEmpty()) {
+            return probabilities.get(0).getLang();
         }
         return UNKNOWN_LANG;
     }
@@ -229,13 +227,12 @@ public class Detector {
      * @throws LangDetectException 
      *  code = ErrorCode.CantDetectError : Can't detect because of no valid features in text
      */
-    public ArrayList<Language> getProbabilities() throws LangDetectException {
+    public List<Language> getProbabilities() throws LangDetectException {
         if (langprob == null) {
             detectBlock();
         }
 
-        ArrayList<Language> list = sortProbability(langprob);
-        return list;
+        return sortProbability(langprob);
     }
     
     /**
@@ -381,7 +378,7 @@ public class Detector {
             double p = prob[j];
             if (p > PROB_THRESHOLD) {
                 for (int i = 0; i <= list.size(); ++i) {
-                    if (i == list.size() || list.get(i).prob < p) {
+                    if (i == list.size() || list.get(i).getProb() < p) {
                         list.add(i, new Language(langlist.get(j), p));
                         break;
                     }
