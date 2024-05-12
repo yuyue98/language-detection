@@ -1,6 +1,7 @@
 package com.cybozu.labs.langdetect.util;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,13 +15,14 @@ import java.util.Set;
  * @author Nakatani Shuyo
  */
 @Getter
+@Setter
 public class LangProfile {
     private static final int MINIMUM_FREQ = 2;
     private static final int LESS_FREQ_RATIO = 100000;
 
     private String name = null;
-    private final Map<String, Integer> freq = new HashMap<>();
-    private final int[] nWords = new int[NGram.N_GRAM];
+    private Map<String, Integer> freq = new HashMap<>();
+    private int[] n_words = new int[NGram.N_GRAM];
 
     /**
      * Constructor for JSONIC 
@@ -47,7 +49,7 @@ public class LangProfile {
         if (len < 1 || len > NGram.N_GRAM) {
             return;  // Illegal
         }
-        ++this.getNWords()[len - 1];
+        ++this.getN_words()[len - 1];
         if (this.getFreq().containsKey(gram)) {
             this.getFreq().put(gram, this.getFreq().get(gram) + 1);
         } else {
@@ -62,7 +64,7 @@ public class LangProfile {
         if (this.getName() == null) {
             return;   // Illegal
         }
-        int threshold = this.getNWords()[0] / LESS_FREQ_RATIO;
+        int threshold = this.getN_words()[0] / LESS_FREQ_RATIO;
         if (threshold < MINIMUM_FREQ) {
             threshold = MINIMUM_FREQ;
         }
@@ -73,7 +75,7 @@ public class LangProfile {
             String key = i.next();
             int count = this.getFreq().get(key);
             if (count <= threshold) {
-                this.getNWords()[key.length()-1] -= count;
+                this.getN_words()[key.length()-1] -= count;
                 i.remove();
             } else {
                 if (key.matches("^[A-Za-z]$")) {
@@ -83,12 +85,12 @@ public class LangProfile {
         }
 
         // roman check
-        if (roman < this.getNWords()[0] / 3) {
+        if (roman < this.getN_words()[0] / 3) {
             Set<String> keys2 = this.getFreq().keySet();
             for(Iterator<String> i = keys2.iterator(); i.hasNext(); ){
                 String key = i.next();
                 if (key.matches(".*[A-Za-z].*")) {
-                    this.getNWords()[key.length()-1] -= this.getFreq().get(key);
+                    this.getN_words()[key.length()-1] -= this.getFreq().get(key);
                     i.remove();
                 }
             }

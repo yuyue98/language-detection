@@ -165,7 +165,7 @@ public class DetectorFactory {
             }
             int length = word.length();
             if (length >= 1 && length <= 3) {
-                double prob = profile.getFreq().get(word).doubleValue() / profile.getNWords()[length - 1];
+                double prob = profile.getFreq().get(word).doubleValue() / profile.getN_words()[length - 1];
                 INSTANCE.getWordLangProbMap().get(word)[index] = prob;
             }
         }
